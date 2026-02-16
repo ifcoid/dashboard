@@ -59,6 +59,18 @@ export function getAuthToken() {
     }
 
     const storedToken = localStorage.getItem('auth_token');
+
+    // Debug: Check if old key exists
+    if (!storedToken) {
+        const oldToken = localStorage.getItem('token');
+        if (oldToken) {
+            console.log('Found old token key, migrating...');
+            localStorage.setItem('auth_token', oldToken);
+            localStorage.removeItem('token');
+            return oldToken;
+        }
+    }
+
     if (storedToken) {
         console.log('Token found in localStorage');
     } else {
@@ -70,5 +82,6 @@ export function getAuthToken() {
 export function logout() {
     console.log('Logging out...');
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_data'); // Clear user data too
     window.location.href = '/login';
 }
