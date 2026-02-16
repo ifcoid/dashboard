@@ -5,17 +5,24 @@ async function initApp() {
     const token = getAuthToken();
 
     if (!token) {
+        console.log('No token available, redirecting to login');
         // Not logged in, redirect to login
         window.location.href = '/login';
         return;
     }
 
+    console.log('Token present, fetching user data...');
+
     try {
         const user = await getUser(token);
         if (!user) {
+            console.error('User fetch failed (invalid token?), logging out');
+            alert('Session expired. Please login again.');
             logout(); // Invalid token
             return;
         }
+
+        console.log('User fetched successfully:', user.name);
 
         renderDashboard(user);
 

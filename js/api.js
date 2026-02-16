@@ -48,16 +48,27 @@ export function getAuthToken() {
     const tokenFromUrl = urlParams.get('token');
 
     if (tokenFromUrl) {
+        console.log('Token found in URL, saving to localStorage...');
         // Save to localStorage and clear URL
         localStorage.setItem('auth_token', tokenFromUrl);
-        window.history.replaceState({}, document.title, window.location.pathname);
+
+        // Clean URL without reloading
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
         return tokenFromUrl;
     }
 
-    return localStorage.getItem('auth_token');
+    const storedToken = localStorage.getItem('auth_token');
+    if (storedToken) {
+        console.log('Token found in localStorage');
+    } else {
+        console.log('No token found');
+    }
+    return storedToken;
 }
 
 export function logout() {
+    console.log('Logging out...');
     localStorage.removeItem('auth_token');
     window.location.href = '/login';
 }
