@@ -43,6 +43,30 @@ export async function updateUser(userId, data, token) {
     }
 }
 
+export async function validateToken(provider, token, authToken) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/tokens/validate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ provider, token })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Validation failed');
+        }
+
+        return data; // { success: true, message: "..." }
+    } catch (error) {
+        console.error('Token validation error:', error);
+        throw error;
+    }
+}
+
 export function getAuthToken() {
     // Check URL parameters first (e.g., after login redirect)
     const urlParams = new URLSearchParams(window.location.search);

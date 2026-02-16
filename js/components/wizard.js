@@ -54,7 +54,7 @@ export class Wizard {
                         placeholder="${step.placeholder}" 
                         id="input-step-${index}"
                         autocomplete="off">
-                    <div class="input-helper">
+                    <div class="input-helper" id="helper-step-${index}">
                         <a href="${step.helpLink}" target="_blank">Get your token here ↗</a>
                     </div>
                 </div>
@@ -80,21 +80,71 @@ export class Wizard {
         });
     }
 
-    next() {
+    async next() {
         const input = this.overlay.querySelector(`#input-step-${this.currentStep}`);
+        const nextBtn = this.overlay.querySelector('#wizard-next-btn');
+        const helperText = this.overlay.querySelector(`#helper-step-${this.currentStep}`);
+
         const value = input.value.trim();
         const currentStepConfig = this.steps[this.currentStep];
 
-        // Validation (if required)
+        // Reset previous errors
+        input.style.borderColor = '#e2e8f0';
+        if (helperText) helperText.style.color = '#64748b';
+
+        // Basic Validation
         if (currentStepConfig.required && !value) {
             input.focus();
-            input.style.borderColor = 'red';
+            input.style.borderColor = '#ef4444';
             return;
         }
 
-        // Save data
+        // If value exists, Validate with Backend
         if (value) {
-            this.data[currentStepConfig.field] = value;
+            // Show loading state
+            const originalText = nextBtn.textContent;
+            nextBtn.textContent = 'Verifying...';
+            nextBtn.disabled = true;
+            input.disabled = true;
+
+            try {
+                // Determine provider based on field name (e.g. token_github -> github)
+                // Assuming field format is always token_{provider}
+                const provider = currentStepConfig.field.replace('token_', '');
+
+                // Import validateToken dynamically or assume it's available globally/passed in
+                // Since this is a class, we might need to pass api functions in constructor or import them
+                // For now, let's assume we import it at the top of this file
+                const { validateToken, getAuthToken } = await import('../api.js');
+                const token = getAuthToken();
+
+                await validateToken(provider, value, token);
+
+                // Validation success
+                this.data[currentStepConfig.field] = value;
+
+            } catch (error) {
+                // Validation failed
+                input.style.borderColor = '#ef4444';
+                if (helperText) {
+                    helperText.style.color = '#ef4444';
+                    helperText.textContent = `Error: ${error.message}`;
+                } else {
+                    alert(`Invalid Token: ${error.message}`);
+                }
+
+                // Reset loading state
+                nextBtn.textContent = originalText;
+                nextBtn.disabled = false;
+                input.disabled = false;
+                input.focus();
+                return; // Stop here
+            }
+
+            // Reset loading state for next step
+            nextBtn.textContent = originalText;
+            nextBtn.disabled = false;
+            input.disabled = false;
         }
 
         // Move to next step or finish
