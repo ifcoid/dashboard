@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8080/api/v1'; // Adjust if needed
+const API_BASE_URL = 'https://lea.fly.dev/api/v1'; // Production backend
 
 export async function getUser(token) {
     if (!token) return null;
