@@ -50,7 +50,7 @@ export const tokenSteps = [
         description: 'Enhance your research with AI-powered analysis tools.',
         inputLabel: 'Z.ai API Token',
         placeholder: 'Paste your API token here',
-        helpLink: 'https://z.ai/manage-apikey/apikey-list',
+        helpLink: 'https://open.bigmodel.cn/usercenter/apikeys',
         field: 'token_z',
         required: false
     }
