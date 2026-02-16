@@ -4,17 +4,18 @@ export async function getUser(token) {
     if (!token) return null;
 
     try {
-        // Decode token to get user ID (simplified, ideally use a proper JWT library or dedicated endpoint)
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const userId = payload.id; // Adjust based on your token payload structure
-
-        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+        // Use /auth/me endpoint instead of decoding token
+        const response = await fetch('https://lea.fly.dev/auth/me', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
 
-        if (!response.ok) throw new Error('Failed to fetch user');
+        if (!response.ok) {
+            console.error('API Response:', response.status, response.statusText);
+            throw new Error('Failed to fetch user');
+        }
+
         const data = await response.json();
         return data.data;
     } catch (error) {
