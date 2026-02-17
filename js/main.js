@@ -64,7 +64,7 @@ function renderDashboard(user) {
         icon: '🔗',
         description: 'Manage your API connections to GitHub, Scopus, IEEE, and more.',
         actionText: 'Manage Connections',
-        onClick: 'openTokenWizard'
+        onClick: 'openTokenWizard()'
     })}
 
                 <!-- 2. Find Papers -->
