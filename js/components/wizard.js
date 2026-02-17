@@ -1,10 +1,12 @@
 export class Wizard {
-    constructor({ steps, onComplete, onSkip }) {
+    constructor({ steps, onComplete, onSkip, defaultValues = {}, title = 'Setup Your Research Tools' }) {
         this.steps = steps;
         this.currentStep = 0;
         this.onComplete = onComplete;
         this.onSkip = onSkip;
         this.data = {};
+        this.defaultValues = defaultValues;
+        this.title = title;
 
         this.overlay = null;
     }
@@ -16,7 +18,7 @@ export class Wizard {
         this.overlay.innerHTML = `
             <div class="wizard-card">
                 <div class="wizard-header">
-                    <h2 class="wizard-title">Setup Your Research Tools</h2>
+                    <h2 class="wizard-title">${this.title}</h2>
                     <p class="wizard-subtitle">Step <span id="wizard-step-num">1</span> of ${this.steps.length}</p>
                     <div class="wizard-progress">
                         ${this.steps.map((_, i) => `
@@ -42,6 +44,7 @@ export class Wizard {
     }
 
     renderStep(step, index) {
+        const defaultValue = this.defaultValues[step.field] || '';
         return `
             <div class="wizard-step ${index === 0 ? 'active' : ''}" data-step="${index}">
                 <div class="step-icon">${step.icon}</div>
@@ -53,6 +56,7 @@ export class Wizard {
                     <input type="text" class="form-input" 
                         placeholder="${step.placeholder}" 
                         id="input-step-${index}"
+                        value="${defaultValue}"
                         autocomplete="off">
                     <div class="input-helper" id="helper-step-${index}">
                         <a href="${step.helpLink}" target="_blank">Get your token here ↗</a>

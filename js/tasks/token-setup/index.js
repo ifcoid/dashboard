@@ -2,25 +2,29 @@ import { Wizard } from '../../components/wizard.js';
 import { tokenSteps } from './steps.js';
 import { updateUser } from '../../api.js';
 
-export function startTokenSetup(user, onComplete) {
-    // Filter steps based on what's already connected (optional, or force check all)
-    // For now, we show all steps that are missing or show all if it's first run
+export function startTokenSetup(user, onComplete, mode = 'setup') {
+    // Determine steps to show
+    let stepsToShow = tokenSteps;
+    let wizardTitle = 'Setup Your Research Tools';
 
-    // Identify missing tokens
-    const missingTokens = tokenSteps.filter(step => {
-        // Check if user has this token (convert field name like 'token_github' to CamelCase or check directly if API returns matching keys)
-        // Assuming API returns JSON keys like 'token_github', 'token_scopus' etc.
-        return !user[step.field];
-    });
+    if (mode === 'setup') {
+        // In setup mode, only show missing tokens
+        stepsToShow = tokenSteps.filter(step => !user[step.field]);
 
-    if (missingTokens.length === 0) {
-        console.log('All tokens already set up!');
-        if (onComplete) onComplete();
-        return;
+        if (stepsToShow.length === 0) {
+            console.log('All tokens already set up!');
+            if (onComplete) onComplete();
+            return;
+        }
+    } else {
+        // Update mode: Show all tokens, and set title
+        wizardTitle = 'Manage Your Research Tools';
     }
 
     const wizard = new Wizard({
-        steps: missingTokens,
+        steps: stepsToShow,
+        defaultValues: user, // Pass current user data as default values
+        title: wizardTitle,
         onComplete: async (data) => {
             try {
                 await updateUser(user.id, data, localStorage.getItem('auth_token'));

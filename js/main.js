@@ -84,7 +84,7 @@ function renderDashboard(user) {
 
     // Quick hack for demo interaction (ideally delegate events)
     window.openTokenWizard = () => {
-        startTokenSetup(user);
+        startTokenSetup(user, null, 'update');
     };
 }
 
